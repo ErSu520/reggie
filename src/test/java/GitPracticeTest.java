@@ -3,7 +3,8 @@
 public class GitPracticeTest {
 
     public static void main(String[] args) {
-        System.out.println(123);
+        Test test = new Test1();
+        test.test();
     }
 
 }
