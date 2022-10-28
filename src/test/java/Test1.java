@@ -1,4 +1,4 @@
-public class Test2 implements Test{
+public class Test1 implements Test{
 
     @Override
     public void test() {
