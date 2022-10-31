@@ -12,7 +12,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 public class EmployeeController {
 
     @Autowired
-    public EmployeeService employeeService;
+    private EmployeeService employeeService;
 
     @PostMapping("/login")
     public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee){
