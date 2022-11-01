@@ -13,11 +13,14 @@ import com.flash.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,7 +35,7 @@ public class DishController {
     private DishFlavorService dishFlavorService;
 
     @Autowired
-    private CategoryService categoryService;
+    private RedisTemplate redisTemplate;
 
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto){
@@ -99,6 +102,14 @@ public class DishController {
 
     @GetMapping("list")
     public R<List> list(Dish dish){
+        List<DishDto> dishDtoList = null;
+
+        String key = "dish_category_id_" + dish.getCategoryId();
+        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+        if(dishDtoList != null){
+            return R.success(dishDtoList);
+        }
+
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         dishLambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId())
                 .orderByAsc(Dish::getSort)
@@ -106,7 +117,7 @@ public class DishController {
 
         List<Dish> list = dishService.list(dishLambdaQueryWrapper);
 
-        List<DishDto> dishDtoList = list.stream().map(item ->{
+        dishDtoList = list.stream().map(item ->{
             DishDto dishDto = new DishDto();
             BeanUtils.copyProperties(item, dishDto);
 
@@ -116,6 +127,8 @@ public class DishController {
 
             return dishDto;
         }).collect(Collectors.toList());
+
+        redisTemplate.opsForValue().set(key, dishDtoList, 120, TimeUnit.SECONDS);
 
         return R.success(dishDtoList);
     }

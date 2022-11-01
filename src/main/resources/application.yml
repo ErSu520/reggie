@@ -30,3 +30,4 @@ mybatis-plus:
       id-type: ASSIGN_ID
 reggie:
   path: /usr/local/apps/images/
+#  path: D:\\web\images
