@@ -1,6 +1,7 @@
 package com.flash.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.flash.reggie.common.R;
 import com.flash.reggie.entity.Employee;
@@ -58,13 +59,17 @@ public class EmployeeController {
     @PostMapping
     public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
         log.info("插入员工信息成功{}", employee.toString());
+        LambdaQueryWrapper<Employee> employeeLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        employeeLambdaQueryWrapper.eq(Employee::getPhone, employee.getPhone());
+        if(employeeService.count(employeeLambdaQueryWrapper) > 0){
+            return R.success("手机号已使用");
+        }
+
+        //生成订单号
+        long newId = IdWorker.getId();
+        employee.setId(newId);
         employee.setPassword(DEFAULT_PASSWORD);
-//        employee.setCreateTime(LocalDateTime.now());
-//        employee.setUpdateTime(LocalDateTime.now());
-//
-//        Long operatorId = (Long) request.getSession().getAttribute("employee");
-//        employee.setCreateUser(operatorId);
-//        employee.setUpdateUser(operatorId);
+        employee.setStatus(1);
 
         employeeService.save(employee);
 
