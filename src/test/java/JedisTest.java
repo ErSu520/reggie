@@ -1,4 +1,3 @@
-import org.junit.jupiter.api.Test;
 import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
@@ -6,7 +5,6 @@ import java.util.Map;
 
 public class JedisTest {
 
-    @Test
     public void test(){
         Jedis jedis = new Jedis("192.168.106.133", 6379);
 
